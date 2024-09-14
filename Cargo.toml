@@ -4,3 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+prost = "0.13.2"
+tokio = { version = "1.40.0", features = ["full"] }
+tonic = "0.12.2"
+tonic-reflection = "0.12.2"
+gakusai2024-proto = { git = "ssh://git@github.com/shinbunbun/gakusai2024-proto.git", rev = "f581520" }
+
+[build-dependencies]
+tonic-build = "0.12.2"
