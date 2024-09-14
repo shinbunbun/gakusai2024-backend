@@ -5,5 +5,6 @@ pkgs.mkShell {
     pkgs.rustup
     pkgs.protobuf
     pkgs.libiconv
+    pkgs.evans
   ];
 }

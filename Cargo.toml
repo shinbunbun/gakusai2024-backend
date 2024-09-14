@@ -8,7 +8,9 @@ prost = "0.13.2"
 tokio = { version = "1.40.0", features = ["full"] }
 tonic = "0.12.2"
 tonic-reflection = "0.12.2"
-gakusai2024-proto = { git = "ssh://git@github.com/shinbunbun/gakusai2024-proto.git", rev = "f581520" }
+gakusai2024-proto = { git = "ssh://git@github.com/shinbunbun/gakusai2024-proto.git", rev = "3bf1c72" }
+env_logger = "0.11.5"
+log = "0.4.22"
 
 [build-dependencies]
 tonic-build = "0.12.2"
