@@ -3,12 +3,12 @@ use std::future::Future;
 use mockall::automock;
 
 use crate::{
-    domain::{hello::Hello, repository::hello::HelloRepository},
+    domain::{hello::Hello, repository::hello::HelloRepositoryTrait},
     error::CustomError,
 };
 
 #[automock]
-pub trait HelloUsecaseTrait<HR: HelloRepository + 'static> {
+pub trait HelloUsecaseTrait<HR: HelloRepositoryTrait + 'static> {
     fn new(repository: Box<HR>) -> Self
     where
         Self: Sized;
@@ -16,11 +16,11 @@ pub trait HelloUsecaseTrait<HR: HelloRepository + 'static> {
     fn find(&self, name: String) -> impl Future<Output = Result<Hello, CustomError>> + Send;
 }
 
-pub struct HelloUsecase<HR: HelloRepository> {
+pub struct HelloUsecase<HR: HelloRepositoryTrait> {
     repository: Box<HR>,
 }
 
-impl<HR: HelloRepository + 'static> HelloUsecaseTrait<HR> for HelloUsecase<HR> {
+impl<HR: HelloRepositoryTrait + 'static> HelloUsecaseTrait<HR> for HelloUsecase<HR> {
     fn new(repository: Box<HR>) -> Self {
         Self { repository }
     }
@@ -40,11 +40,11 @@ mod tests {
     use mockall::predicate::eq;
 
     use super::*;
-    use crate::domain::{hello::Hello, repository::hello::MockHelloRepository};
+    use crate::domain::{hello::Hello, repository::hello::MockHelloRepositoryTrait};
 
     #[tokio::test]
     async fn test_insert() {
-        let mut mock = MockHelloRepository::default();
+        let mut mock = MockHelloRepositoryTrait::default();
         mock.expect_insert()
             .returning(|_| Box::pin(async { Ok("test_name".to_string()) }));
 
@@ -60,7 +60,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_find() {
-        let mut mock = MockHelloRepository::default();
+        let mut mock = MockHelloRepositoryTrait::default();
         let except_hello = Hello {
             name: "test_name".to_string(),
             message: "test_message".to_string(),

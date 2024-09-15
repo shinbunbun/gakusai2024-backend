@@ -1,12 +1,12 @@
 use gakusai2024_proto::hello::{hello_service_server::HelloService, HelloRequest, HelloResponse};
 use tonic::{Request, Response, Status};
 
-use crate::{domain::repository::hello::HelloRepository, usecase::hello::HelloUsecaseTrait};
+use crate::{domain::repository::hello::HelloRepositoryTrait, usecase::hello::HelloUsecaseTrait};
 
 pub trait HelloHandlerTrait<HU, HR>
 where
     HU: HelloUsecaseTrait<HR>,
-    HR: HelloRepository + 'static,
+    HR: HelloRepositoryTrait + 'static,
 {
     fn new(usecase: Box<HU>) -> Self
     where
@@ -16,7 +16,7 @@ where
 pub struct HelloHandler<HU, HR>
 where
     HU: HelloUsecaseTrait<HR>,
-    HR: HelloRepository + 'static,
+    HR: HelloRepositoryTrait + 'static,
 {
     usecase: Box<HU>,
     _phantom: std::marker::PhantomData<HR>,
@@ -25,7 +25,7 @@ where
 impl<HU, HR> HelloHandlerTrait<HU, HR> for HelloHandler<HU, HR>
 where
     HU: HelloUsecaseTrait<HR>,
-    HR: HelloRepository,
+    HR: HelloRepositoryTrait,
 {
     fn new(usecase: Box<HU>) -> Self {
         Self {
@@ -39,7 +39,7 @@ where
 impl<HU, HR> HelloService for HelloHandler<HU, HR>
 where
     HU: HelloUsecaseTrait<HR> + 'static + Sync + Send,
-    HR: HelloRepository + Sync + Send + 'static,
+    HR: HelloRepositoryTrait + Sync + Send + 'static,
 {
     async fn say_hello(
         &self,

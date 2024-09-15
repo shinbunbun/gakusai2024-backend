@@ -5,7 +5,7 @@ use sea_orm::{DatabaseConnection, EntityTrait, IntoSimpleExpr, QueryFilter, Set}
 use tokio::sync::Mutex;
 
 use crate::{
-    domain::{hello::Hello, repository::hello::HelloRepository},
+    domain::{hello::Hello, repository::hello::HelloRepositoryTrait},
     error::CustomError,
 };
 
@@ -17,7 +17,7 @@ pub struct HelloPersistence {
     repository: Repository,
 }
 
-impl HelloRepository for HelloPersistence {
+impl HelloRepositoryTrait for HelloPersistence {
     fn new(conn: Arc<Mutex<DatabaseConnection>>) -> Self
     where
         Self: Sized,

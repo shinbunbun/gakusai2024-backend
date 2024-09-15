@@ -6,7 +6,7 @@ use sea_orm::DatabaseConnection;
 use crate::{domain::hello::Hello, error::CustomError};
 
 #[automock]
-pub trait HelloRepository {
+pub trait HelloRepositoryTrait {
     fn new(conn: Arc<tokio::sync::Mutex<DatabaseConnection>>) -> Self
     where
         Self: Sized;

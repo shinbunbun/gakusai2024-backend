@@ -14,7 +14,7 @@ mod tests {
     use tower::service_fn;
 
     use crate::{
-        domain::repository::hello::HelloRepository,
+        domain::repository::hello::HelloRepositoryTrait,
         infrastructure,
         interface::{self, handler::hello::HelloHandlerTrait},
         usecase::{self, hello::HelloUsecaseTrait},

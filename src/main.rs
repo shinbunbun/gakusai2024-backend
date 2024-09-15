@@ -8,7 +8,7 @@ mod util;
 
 use std::{env, sync::Arc};
 
-use domain::repository::hello::HelloRepository;
+use domain::repository::hello::HelloRepositoryTrait;
 use dotenv::dotenv;
 use sea_orm::Database;
 use tokio::sync::Mutex;
