@@ -1,7 +1,8 @@
-use std::sync::Arc;
+use std::{ops::Deref, sync::Arc};
 
 use entity::hello::{self, ActiveModel};
 use sea_orm::{DatabaseConnection, EntityTrait, IntoSimpleExpr, QueryFilter, Set};
+use tokio::sync::Mutex;
 
 use crate::{
     domain::{hello::Hello, repository::hello::HelloRepository},
@@ -17,7 +18,7 @@ pub struct HelloPersistence {
 }
 
 impl HelloRepository for HelloPersistence {
-    fn new(conn: Arc<DatabaseConnection>) -> Self
+    fn new(conn: Arc<Mutex<DatabaseConnection>>) -> Self
     where
         Self: Sized,
     {
@@ -26,7 +27,9 @@ impl HelloRepository for HelloPersistence {
         }
     }
     async fn insert(&self, hello: Hello) -> Result<String, CustomError> {
-        let db = &*self.repository.get_db();
+        let db_unlock = self.repository.get_db();
+        let db_lock = db_unlock.lock().await;
+        let db = db_lock.deref();
         let hello_am = ActiveModel {
             name: Set(hello.name),
             message: Set(hello.message),
@@ -36,7 +39,9 @@ impl HelloRepository for HelloPersistence {
     }
 
     async fn find(&self, name: String) -> Result<Hello, CustomError> {
-        let db = &*self.repository.get_db();
+        let db_unlock = self.repository.get_db();
+        let db_lock = db_unlock.lock().await;
+        let db = db_lock.deref();
         let result = HelloEntity::find()
             .filter(hello::Column::Name.into_simple_expr().eq(&name))
             .one(db)

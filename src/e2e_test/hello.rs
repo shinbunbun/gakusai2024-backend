@@ -9,6 +9,7 @@ mod tests {
     };
     use hyper_util::rt::TokioIo;
     use sea_orm::Database;
+    use tokio::sync::Mutex;
     use tonic::transport::{Endpoint, Server, Uri};
     use tower::service_fn;
 
@@ -26,7 +27,8 @@ mod tests {
         let (client, server) = tokio::io::duplex(1024);
 
         let db = Database::connect(db_url).await.unwrap();
-        let hello_persistence = infrastructure::db::hello::HelloPersistence::new(Arc::new(db));
+        let hello_persistence =
+            infrastructure::db::hello::HelloPersistence::new(Arc::new(Mutex::new(db)));
         let hello_usecase = usecase::hello::HelloUsecase::new(Box::new(hello_persistence));
         let hello_handler = interface::handler::hello::HelloHandler::new(Box::new(hello_usecase));
 

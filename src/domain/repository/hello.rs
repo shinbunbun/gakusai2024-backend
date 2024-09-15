@@ -7,7 +7,7 @@ use crate::{domain::hello::Hello, error::CustomError};
 
 #[automock]
 pub trait HelloRepository {
-    fn new(conn: Arc<DatabaseConnection>) -> Self
+    fn new(conn: Arc<tokio::sync::Mutex<DatabaseConnection>>) -> Self
     where
         Self: Sized;
     fn insert(&self, hello: Hello) -> impl Future<Output = Result<String, CustomError>> + Send;
