@@ -3,6 +3,7 @@ mod error;
 mod infrastructure;
 mod interface;
 mod usecase;
+mod util;
 
 use std::sync::Arc;
 

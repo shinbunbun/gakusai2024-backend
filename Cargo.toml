@@ -15,6 +15,7 @@ sea-orm = {version = "1.0.1", features = ["mock", "sqlx-postgres", "runtime-toki
 entity ={ path = "./entity" }
 thiserror = "1.0.63"
 anyhow = "1.0.89"
+mockall = "0.13.0"
 
 [build-dependencies]
 tonic-build = "0.12.2"

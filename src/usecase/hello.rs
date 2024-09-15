@@ -1,11 +1,14 @@
 use std::future::Future;
 
+use mockall::automock;
+
 use crate::{
     domain::{hello::Hello, repository::hello::HelloRepository},
     error::CustomError,
 };
 
-pub trait HelloUsecaseTrait<HR: HelloRepository> {
+#[automock]
+pub trait HelloUsecaseTrait<HR: HelloRepository + 'static> {
     fn new(repository: Box<HR>) -> Self
     where
         Self: Sized;
@@ -17,7 +20,7 @@ pub struct HelloUsecase<HR: HelloRepository> {
     repository: Box<HR>,
 }
 
-impl<HR: HelloRepository> HelloUsecaseTrait<HR> for HelloUsecase<HR> {
+impl<HR: HelloRepository + 'static> HelloUsecaseTrait<HR> for HelloUsecase<HR> {
     fn new(repository: Box<HR>) -> Self {
         Self { repository }
     }
@@ -28,5 +31,51 @@ impl<HR: HelloRepository> HelloUsecaseTrait<HR> for HelloUsecase<HR> {
 
     fn find(&self, name: String) -> impl Future<Output = Result<Hello, CustomError>> + Send {
         self.repository.find(name)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use mockall::predicate::eq;
+
+    use super::*;
+    use crate::domain::{hello::Hello, repository::hello::MockHelloRepository};
+
+    #[tokio::test]
+    async fn test_insert() {
+        let mut mock = MockHelloRepository::default();
+        mock.expect_insert()
+            .returning(|_| Box::pin(async { Ok("test_name".to_string()) }));
+
+        let usecase = HelloUsecase::new(Box::new(mock));
+        let hello = Hello {
+            name: "test_name".to_string(),
+            message: "test_message".to_string(),
+        };
+        let result = usecase.insert(hello).await;
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), "test_name".to_string());
+    }
+
+    #[tokio::test]
+    async fn test_find() {
+        let mut mock = MockHelloRepository::default();
+        let except_hello = Hello {
+            name: "test_name".to_string(),
+            message: "test_message".to_string(),
+        };
+        mock.expect_find()
+            .with(eq("test_name".to_string()))
+            .returning(move |_| {
+                Box::pin({
+                    let value = except_hello.clone();
+                    async move { Ok(value) }
+                })
+            });
+
+        let usecase = HelloUsecase::new(Box::new(mock));
+        let result = usecase.find("test_name".to_string()).await;
+        assert!(result.is_ok());
     }
 }

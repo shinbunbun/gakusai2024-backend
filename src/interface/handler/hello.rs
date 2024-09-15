@@ -6,7 +6,7 @@ use crate::{domain::repository::hello::HelloRepository, usecase::hello::HelloUse
 pub trait HelloHandlerTrait<HU, HR>
 where
     HU: HelloUsecaseTrait<HR>,
-    HR: HelloRepository,
+    HR: HelloRepository + 'static,
 {
     fn new(usecase: Box<HU>) -> Self
     where
@@ -16,7 +16,7 @@ where
 pub struct HelloHandler<HU, HR>
 where
     HU: HelloUsecaseTrait<HR>,
-    HR: HelloRepository,
+    HR: HelloRepository + 'static,
 {
     usecase: Box<HU>,
     _phantom: std::marker::PhantomData<HR>,

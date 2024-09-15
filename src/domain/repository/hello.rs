@@ -1,9 +1,11 @@
 use std::{future::Future, sync::Arc};
 
+use mockall::automock;
 use sea_orm::DatabaseConnection;
 
 use crate::{domain::hello::Hello, error::CustomError};
 
+#[automock]
 pub trait HelloRepository {
     fn new(conn: Arc<DatabaseConnection>) -> Self
     where
