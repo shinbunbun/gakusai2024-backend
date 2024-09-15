@@ -1,3 +1,3 @@
-pub struct Hello {
-    pub name: String,
-}
+use entity::hello::Model;
+
+pub type Hello = Model;

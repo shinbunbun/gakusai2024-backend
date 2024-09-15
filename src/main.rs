@@ -3,7 +3,10 @@ mod infrastructure;
 mod interface;
 mod usecase;
 
+use std::sync::Arc;
+
 use domain::repository::repository::HelloRepository;
+use sea_orm::Database;
 use tonic::transport::Server;
 
 use gakusai2024_proto::hello::hello_service_server::HelloServiceServer;
@@ -15,8 +18,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
     let addr = "127.0.0.1:50051".parse()?;
 
+    let conn = Database::connect("postgres://username:password@localhost/database").await?;
+
     // Dependency Injection
-    let hello_persistence = infrastructure::db::hello::HelloPersistence::new();
+    let hello_persistence = infrastructure::db::hello::HelloPersistence::new(Arc::new(conn));
     let hello_usecase = usecase::hello::HelloUsecase::new(Box::new(hello_persistence));
     let hello_handler = interface::handler::hello::HelloHandler::new(Box::new(hello_usecase));
 

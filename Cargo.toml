@@ -11,6 +11,11 @@ tonic-reflection = "0.12.2"
 gakusai2024-proto = { git = "ssh://git@github.com/shinbunbun/gakusai2024-proto.git", rev = "3bf1c72" }
 env_logger = "0.11.5"
 log = "0.4.22"
+sea-orm = {version = "1.0.1", features = ["mock", "sqlx-postgres", "runtime-tokio-native-tls"] }
+entity ={ path = "./entity" }
 
 [build-dependencies]
 tonic-build = "0.12.2"
+
+[workspace]
+members = ["entity","migration"]

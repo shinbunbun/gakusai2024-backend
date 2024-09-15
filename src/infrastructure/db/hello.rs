@@ -1,3 +1,7 @@
+use std::sync::Arc;
+
+use sea_orm::DatabaseConnection;
+
 use crate::domain::repository::repository::HelloRepository;
 
 use super::Repository;
@@ -7,12 +11,12 @@ pub struct HelloPersistence {
 }
 
 impl HelloRepository for HelloPersistence {
-    fn new() -> Self
+    fn new(conn: Arc<DatabaseConnection>) -> Self
     where
         Self: Sized,
     {
         Self {
-            repository: Repository::new(),
+            repository: Repository::new(conn),
         }
     }
     fn insert(&self, hello: crate::domain::hello::Hello) {

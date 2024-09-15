@@ -1,7 +1,7 @@
 use gakusai2024_proto::hello::{hello_service_server::HelloService, HelloRequest, HelloResponse};
 use tonic::{Request, Response, Status};
 
-use crate::{domain::hello::Hello, usecase::hello::HelloUsecaseTrait};
+use crate::usecase::hello::HelloUsecaseTrait;
 
 pub trait HelloHandlerTrait {
     fn new(usecase: Box<dyn HelloUsecaseTrait>) -> Self
