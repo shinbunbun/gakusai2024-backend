@@ -19,6 +19,7 @@ mockall = "0.13.0"
 tokio-stream = "0.1.16"
 tower = {version = "0.5.1", features = ["util"] }
 hyper-util = "0.1.8"
+dotenv = "0.15.0"
 
 [build-dependencies]
 tonic-build = "0.12.2"

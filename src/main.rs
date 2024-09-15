@@ -6,9 +6,10 @@ mod interface;
 mod usecase;
 mod util;
 
-use std::sync::Arc;
+use std::{env, sync::Arc};
 
 use domain::repository::hello::HelloRepository;
+use dotenv::dotenv;
 use sea_orm::Database;
 use tonic::transport::Server;
 
@@ -19,9 +20,13 @@ use usecase::hello::HelloUsecaseTrait;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
-    let addr = "127.0.0.1:50051".parse()?;
+    dotenv().ok();
+    let addr = env::var("SERVER_ADDR")
+        .expect("SERVER_ADDR must be set")
+        .parse()?;
+    let db_addr = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
-    let conn = Database::connect("postgres://postgres:postgrespassword@localhost:5432").await?;
+    let conn = Database::connect(db_addr).await?;
 
     // Dependency Injection
     let hello_persistence = infrastructure::db::hello::HelloPersistence::new(Arc::new(conn));

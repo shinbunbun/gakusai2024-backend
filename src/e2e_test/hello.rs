@@ -2,6 +2,7 @@
 mod tests {
     use std::sync::Arc;
 
+    use dotenv::dotenv;
     use gakusai2024_proto::hello::{
         hello_service_client::HelloServiceClient, hello_service_server::HelloServiceServer,
         HelloRequest,
@@ -20,11 +21,11 @@ mod tests {
 
     #[tokio::test]
     async fn test_hello() {
+        dotenv().ok();
+        let db_url = std::env::var("DATABASE_URL").unwrap();
         let (client, server) = tokio::io::duplex(1024);
 
-        let db = Database::connect("postgres://postgres:postgrespassword@localhost:5432")
-            .await
-            .unwrap();
+        let db = Database::connect(db_url).await.unwrap();
         let hello_persistence = infrastructure::db::hello::HelloPersistence::new(Arc::new(db));
         let hello_usecase = usecase::hello::HelloUsecase::new(Box::new(hello_persistence));
         let hello_handler = interface::handler::hello::HelloHandler::new(Box::new(hello_usecase));
