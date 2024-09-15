@@ -1,4 +1,5 @@
 mod domain;
+mod e2e_test;
 mod error;
 mod infrastructure;
 mod interface;

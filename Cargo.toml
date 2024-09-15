@@ -16,6 +16,9 @@ entity ={ path = "./entity" }
 thiserror = "1.0.63"
 anyhow = "1.0.89"
 mockall = "0.13.0"
+tokio-stream = "0.1.16"
+tower = {version = "0.5.1", features = ["util"] }
+hyper-util = "0.1.8"
 
 [build-dependencies]
 tonic-build = "0.12.2"
