@@ -1,4 +1,5 @@
 mod domain;
+mod error;
 mod infrastructure;
 mod interface;
 mod usecase;

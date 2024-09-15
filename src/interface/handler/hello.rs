@@ -49,14 +49,15 @@ where
 
         let name = request.into_inner().name;
 
-        self.usecase
+        _ = self
+            .usecase
             .insert(crate::domain::hello::Hello {
                 name: name.clone(),
                 message: "Hello, ".to_string() + &name,
             })
-            .await;
+            .await?;
 
-        let hello = self.usecase.find(name).await;
+        let hello = self.usecase.find(name).await?;
 
         let reply = HelloResponse {
             message: hello.message,

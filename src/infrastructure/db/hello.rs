@@ -3,7 +3,10 @@ use std::sync::Arc;
 use entity::hello::{self, ActiveModel};
 use sea_orm::{DatabaseConnection, EntityTrait, IntoSimpleExpr, QueryFilter, Set};
 
-use crate::domain::repository::hello::HelloRepository;
+use crate::{
+    domain::{hello::Hello, repository::hello::HelloRepository},
+    error::CustomError,
+};
 
 use entity::hello::Entity as HelloEntity;
 
@@ -22,22 +25,28 @@ impl HelloRepository for HelloPersistence {
             repository: Repository::new(conn),
         }
     }
-    async fn insert(&self, hello: crate::domain::hello::Hello) {
+    async fn insert(&self, hello: Hello) -> Result<String, CustomError> {
         let db = &*self.repository.get_db();
         let hello_am = ActiveModel {
             name: Set(hello.name),
             message: Set(hello.message),
         };
-        let _ = HelloEntity::insert(hello_am).exec(db).await.unwrap();
+        let insert_result = HelloEntity::insert(hello_am).exec(db).await?;
+        Ok(insert_result.last_insert_id.to_string())
     }
 
-    async fn find(&self, name: String) -> crate::domain::hello::Hello {
+    async fn find(&self, name: String) -> Result<Hello, CustomError> {
         let db = &*self.repository.get_db();
-        HelloEntity::find()
-            .filter(hello::Column::Name.into_simple_expr().eq(name))
+        let result = HelloEntity::find()
+            .filter(hello::Column::Name.into_simple_expr().eq(&name))
             .one(db)
-            .await
-            .unwrap()
-            .unwrap()
+            .await?;
+        match result {
+            Some(hello) => Ok(Hello {
+                name: hello.name,
+                message: hello.message,
+            }),
+            None => Err(CustomError::DbNotFound(format!("key: {}", &name))),
+        }
     }
 }

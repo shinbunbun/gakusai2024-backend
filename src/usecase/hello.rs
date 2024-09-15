@@ -1,16 +1,16 @@
 use std::future::Future;
 
-use crate::domain::repository::hello::HelloRepository;
+use crate::{
+    domain::{hello::Hello, repository::hello::HelloRepository},
+    error::CustomError,
+};
 
 pub trait HelloUsecaseTrait<HR: HelloRepository> {
     fn new(repository: Box<HR>) -> Self
     where
         Self: Sized;
-    fn insert(
-        &self,
-        hello: crate::domain::hello::Hello,
-    ) -> impl std::future::Future<Output = ()> + Send;
-    fn find(&self, name: String) -> impl Future<Output = crate::domain::hello::Hello> + Send;
+    fn insert(&self, hello: Hello) -> impl Future<Output = Result<String, CustomError>> + Send;
+    fn find(&self, name: String) -> impl Future<Output = Result<Hello, CustomError>> + Send;
 }
 
 pub struct HelloUsecase<HR: HelloRepository> {
@@ -22,14 +22,11 @@ impl<HR: HelloRepository> HelloUsecaseTrait<HR> for HelloUsecase<HR> {
         Self { repository }
     }
 
-    fn insert(
-        &self,
-        hello: crate::domain::hello::Hello,
-    ) -> impl std::future::Future<Output = ()> + Send {
+    fn insert(&self, hello: Hello) -> impl Future<Output = Result<String, CustomError>> + Send {
         self.repository.insert(hello)
     }
 
-    fn find(&self, name: String) -> impl Future<Output = crate::domain::hello::Hello> + Send {
+    fn find(&self, name: String) -> impl Future<Output = Result<Hello, CustomError>> + Send {
         self.repository.find(name)
     }
 }
