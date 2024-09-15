@@ -70,5 +70,6 @@ mod tests {
         let response = client.say_hello(request).await.unwrap();
 
         println!("RESPONSE={:?}", response);
+        assert_eq!(response.get_ref().message, "Hello, Tonic");
     }
 }
