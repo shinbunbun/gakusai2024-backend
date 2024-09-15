@@ -5,7 +5,7 @@ mod usecase;
 
 use std::sync::Arc;
 
-use domain::repository::repository::HelloRepository;
+use domain::repository::hello::HelloRepository;
 use sea_orm::Database;
 use tonic::transport::Server;
 

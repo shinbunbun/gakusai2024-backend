@@ -1,6 +1,6 @@
 use std::future::Future;
 
-use crate::domain::repository::repository::HelloRepository;
+use crate::domain::repository::hello::HelloRepository;
 
 pub trait HelloUsecaseTrait<HR: HelloRepository> {
     fn new(repository: Box<HR>) -> Self

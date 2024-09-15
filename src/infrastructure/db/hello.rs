@@ -3,7 +3,7 @@ use std::sync::Arc;
 use entity::hello::{self, ActiveModel};
 use sea_orm::{DatabaseConnection, EntityTrait, IntoSimpleExpr, QueryFilter, Set};
 
-use crate::domain::repository::repository::HelloRepository;
+use crate::domain::repository::hello::HelloRepository;
 
 use entity::hello::Entity as HelloEntity;
 
@@ -23,7 +23,7 @@ impl HelloRepository for HelloPersistence {
         }
     }
     async fn insert(&self, hello: crate::domain::hello::Hello) {
-        let db = &*self.repository.db;
+        let db = &*self.repository.get_db();
         let hello_am = ActiveModel {
             name: Set(hello.name),
             message: Set(hello.message),
@@ -32,7 +32,7 @@ impl HelloRepository for HelloPersistence {
     }
 
     async fn find(&self, name: String) -> crate::domain::hello::Hello {
-        let db = &*self.repository.db;
+        let db = &*self.repository.get_db();
         HelloEntity::find()
             .filter(hello::Column::Name.into_simple_expr().eq(name))
             .one(db)
