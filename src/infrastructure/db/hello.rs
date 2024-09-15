@@ -1,8 +1,11 @@
 use std::sync::Arc;
 
-use sea_orm::DatabaseConnection;
+use entity::hello::{self, ActiveModel};
+use sea_orm::{DatabaseConnection, EntityTrait, IntoSimpleExpr, QueryFilter, Set};
 
 use crate::domain::repository::repository::HelloRepository;
+
+use entity::hello::Entity as HelloEntity;
 
 use super::Repository;
 
@@ -19,11 +22,22 @@ impl HelloRepository for HelloPersistence {
             repository: Repository::new(conn),
         }
     }
-    fn insert(&self, hello: crate::domain::hello::Hello) {
-        unimplemented!()
+    async fn insert(&self, hello: crate::domain::hello::Hello) {
+        let db = &*self.repository.db;
+        let hello_am = ActiveModel {
+            name: Set(hello.name),
+            message: Set(hello.message),
+        };
+        let _ = HelloEntity::insert(hello_am).exec(db).await.unwrap();
     }
 
-    fn find(&self, name: String) -> crate::domain::hello::Hello {
-        unimplemented!()
+    async fn find(&self, name: String) -> crate::domain::hello::Hello {
+        let db = &*self.repository.db;
+        HelloEntity::find()
+            .filter(hello::Column::Name.into_simple_expr().eq(name))
+            .one(db)
+            .await
+            .unwrap()
+            .unwrap()
     }
 }

@@ -1,34 +1,65 @@
 use gakusai2024_proto::hello::{hello_service_server::HelloService, HelloRequest, HelloResponse};
 use tonic::{Request, Response, Status};
 
-use crate::usecase::hello::HelloUsecaseTrait;
+use crate::{domain::repository::repository::HelloRepository, usecase::hello::HelloUsecaseTrait};
 
-pub trait HelloHandlerTrait {
-    fn new(usecase: Box<dyn HelloUsecaseTrait>) -> Self
+pub trait HelloHandlerTrait<HU, HR>
+where
+    HU: HelloUsecaseTrait<HR>,
+    HR: HelloRepository,
+{
+    fn new(usecase: Box<HU>) -> Self
     where
         Self: Sized;
 }
 
-pub struct HelloHandler {
-    usecase: Box<dyn HelloUsecaseTrait>,
+pub struct HelloHandler<HU, HR>
+where
+    HU: HelloUsecaseTrait<HR>,
+    HR: HelloRepository,
+{
+    usecase: Box<HU>,
+    _phantom: std::marker::PhantomData<HR>,
 }
 
-impl HelloHandlerTrait for HelloHandler {
-    fn new(usecase: Box<dyn HelloUsecaseTrait>) -> Self {
-        Self { usecase }
+impl<HU, HR> HelloHandlerTrait<HU, HR> for HelloHandler<HU, HR>
+where
+    HU: HelloUsecaseTrait<HR>,
+    HR: HelloRepository,
+{
+    fn new(usecase: Box<HU>) -> Self {
+        Self {
+            usecase,
+            _phantom: std::marker::PhantomData,
+        }
     }
 }
 
 #[tonic::async_trait]
-impl HelloService for HelloHandler {
+impl<HU, HR> HelloService for HelloHandler<HU, HR>
+where
+    HU: HelloUsecaseTrait<HR> + 'static + Sync + Send,
+    HR: HelloRepository + Sync + Send + 'static,
+{
     async fn say_hello(
         &self,
         request: Request<HelloRequest>,
     ) -> Result<Response<HelloResponse>, Status> {
         log::info!("Got a request: {:?}", request);
 
+        let name = request.into_inner().name;
+
+        self.usecase
+            .insert(crate::domain::hello::Hello {
+                name: name.clone(),
+                message: "Hello, ".to_string() + &name,
+            })
+            .await;
+
+        let hello = self.usecase.find(name).await;
+
         let reply = HelloResponse {
-            message: format!("Hello {}!", request.into_inner().name),
+            message: hello.message,
         };
 
         Ok(Response::new(reply))

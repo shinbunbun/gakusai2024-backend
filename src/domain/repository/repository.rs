@@ -1,13 +1,13 @@
-use std::sync::Arc;
+use std::{future::Future, process::Output, sync::Arc};
 
 use sea_orm::DatabaseConnection;
 
 use crate::domain::hello::Hello;
 
-pub trait HelloRepository: Send + Sync {
+pub trait HelloRepository {
     fn new(conn: Arc<DatabaseConnection>) -> Self
     where
         Self: Sized;
-    fn insert(&self, hello: Hello);
-    fn find(&self, name: String) -> Hello;
+    fn insert(&self, hello: Hello) -> impl Future<Output = ()> + Send;
+    fn find(&self, name: String) -> impl Future<Output = Hello> + Send;
 }

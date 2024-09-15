@@ -18,7 +18,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
     let addr = "127.0.0.1:50051".parse()?;
 
-    let conn = Database::connect("postgres://username:password@localhost/database").await?;
+    let conn = Database::connect("postgres://postgres:postgrespassword@localhost:5432").await?;
 
     // Dependency Injection
     let hello_persistence = infrastructure::db::hello::HelloPersistence::new(Arc::new(conn));

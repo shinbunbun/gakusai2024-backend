@@ -13,6 +13,7 @@ impl MigrationTrait for Migration {
                     .table(Entity)
                     .if_not_exists()
                     .col(ColumnDef::new(Column::Name).string().not_null())
+                    .col(ColumnDef::new(Column::Message).string().not_null())
                     .to_owned(),
             )
             .await

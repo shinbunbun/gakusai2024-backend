@@ -5,6 +5,7 @@ use sea_orm::entity::prelude::*;
 pub struct Model {
     #[sea_orm(primary_key)]
     pub name: String,
+    pub message: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
