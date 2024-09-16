@@ -1017,7 +1017,18 @@ dependencies = [
 ]
 
 [[package]]
-name = "gakusai2024-backend"
+name = "gakusai2024-proto"
+version = "0.1.0"
+source = "git+ssh://git@github.com/shinbunbun/gakusai2024-proto.git?rev=d896b58#d896b58f4a4b88cc4a6de0c71508efb35f7951f8"
+dependencies = [
+ "bytes",
+ "prost",
+ "tonic",
+ "tonic-build",
+]
+
+[[package]]
+name = "gakusai2024_backend"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -1038,17 +1049,6 @@ dependencies = [
  "tonic-reflection",
  "tower 0.5.1",
  "uuid",
-]
-
-[[package]]
-name = "gakusai2024-proto"
-version = "0.1.0"
-source = "git+ssh://git@github.com/shinbunbun/gakusai2024-proto.git?rev=d896b58#d896b58f4a4b88cc4a6de0c71508efb35f7951f8"
-dependencies = [
- "bytes",
- "prost",
- "tonic",
- "tonic-build",
 ]
 
 [[package]]

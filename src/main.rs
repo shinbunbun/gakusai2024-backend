@@ -1,22 +1,17 @@
-mod domain;
-mod e2e_test;
-mod error;
-mod infrastructure;
-mod interface;
-mod usecase;
-mod util;
-
 use std::{env, sync::Arc};
 
-use domain::repository::hello::HelloRepositoryTrait;
 use dotenv::dotenv;
+use gakusai2024_backend::domain::repository::hello::HelloRepositoryTrait;
 use gakusai2024_proto::api::hello_service_server::HelloServiceServer;
 use sea_orm::Database;
 use tokio::sync::Mutex;
 use tonic::transport::Server;
 
-use interface::handler::hello::HelloHandlerTrait;
-use usecase::hello::HelloUsecaseTrait;
+use gakusai2024_backend::infrastructure;
+use gakusai2024_backend::interface;
+use gakusai2024_backend::interface::handler::hello::HelloHandlerTrait;
+use gakusai2024_backend::usecase;
+use gakusai2024_backend::usecase::hello::HelloUsecaseTrait;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

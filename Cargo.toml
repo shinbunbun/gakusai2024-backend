@@ -1,7 +1,11 @@
 [package]
-name = "gakusai2024-backend"
+name = "gakusai2024_backend"
 version = "0.1.0"
 edition = "2021"
+
+[lib]
+name = "gakusai2024_backend" 
+path = "src/lib.rs"  
 
 [dependencies]
 prost = "0.13.2"
