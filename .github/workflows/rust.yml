@@ -23,6 +23,8 @@ jobs:
         mkdir -p /home/runner/.ssh/
         echo -e "$TOKEN" > /home/runner/.ssh/id_ed25519
         chmod 600 /home/runner/.ssh/id_ed25519
+    - name: SSH check
+      run: ssh git@github.com
     - name: Build
       run: cargo build --verbose
     - name: Run tests
