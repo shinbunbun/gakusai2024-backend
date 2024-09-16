@@ -20,7 +20,7 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_KEY }}
     - name: Build
-      run: cargo build --verbose
+      run: CARGO_NET_GIT_FETCH_WITH_CLI=true cargo build --verbose
     - name: Run tests
       run: cargo test --verbose
     - name: Run clippy
