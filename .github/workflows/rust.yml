@@ -16,9 +16,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - uses: webfactory/ssh-agent@v0.5.3
-      with:
-        ssh-private-key: ${{ secrets.SSH_KEY }}
+    - name: set SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
+        chmod 600 ~/.ssh/id_ed25519
+        ssh-keyscan github.com >> ~/.ssh/known_hosts
     - name: Build
       run: CARGO_NET_GIT_FETCH_WITH_CLI=true cargo build --verbose
     - name: Run tests
