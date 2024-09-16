@@ -16,15 +16,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: SSH Setting
-      env:
-        TOKEN: ${{ secrets.SSH_KEY }}
-      run: |
-        mkdir -p /home/runner/.ssh/
-        echo -e "$TOKEN" > /home/runner/.ssh/id_ed25519
-        chmod 600 /home/runner/.ssh/id_ed25519
-    - name: SSH check
-      run: ssh git@github.com
+    - uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.SSH_KEY }}
     - name: Build
       run: cargo build --verbose
     - name: Run tests
