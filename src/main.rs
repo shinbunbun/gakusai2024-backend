@@ -10,11 +10,11 @@ use std::{env, sync::Arc};
 
 use domain::repository::hello::HelloRepositoryTrait;
 use dotenv::dotenv;
+use gakusai2024_proto::api::hello_service_server::HelloServiceServer;
 use sea_orm::Database;
 use tokio::sync::Mutex;
 use tonic::transport::Server;
 
-use gakusai2024_proto::hello::hello_service_server::HelloServiceServer;
 use interface::handler::hello::HelloHandlerTrait;
 use usecase::hello::HelloUsecaseTrait;
 

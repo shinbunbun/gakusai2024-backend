@@ -3,15 +3,16 @@ mod tests {
     use std::sync::Arc;
 
     use dotenv::dotenv;
-    use gakusai2024_proto::hello::{
+    use gakusai2024_proto::api::{
         hello_service_client::HelloServiceClient, hello_service_server::HelloServiceServer,
-        HelloRequest,
+        CreateHelloRequest,
     };
     use hyper_util::rt::TokioIo;
     use sea_orm::Database;
     use tokio::sync::Mutex;
     use tonic::transport::{Endpoint, Server, Uri};
     use tower::service_fn;
+    use uuid::Uuid;
 
     use crate::{
         domain::repository::hello::HelloRepositoryTrait,
@@ -63,13 +64,39 @@ mod tests {
 
         let mut client = HelloServiceClient::new(channel);
 
-        let request = tonic::Request::new(HelloRequest {
-            name: "Tonic".into(),
+        let name = Uuid::new_v4().to_string();
+        let message = Uuid::new_v4().to_string();
+
+        let request = tonic::Request::new(CreateHelloRequest {
+            hello: Some(gakusai2024_proto::api::Hello {
+                name: name.clone(),
+                message: message.clone(),
+            }),
         });
 
-        let response = client.say_hello(request).await.unwrap();
+        let create_hello_response = client.create_hello(request).await.unwrap();
 
-        println!("RESPONSE={:?}", response);
-        assert_eq!(response.get_ref().message, "Hello, Tonic");
+        println!("RESPONSE={:?}", create_hello_response);
+
+        let read_hello_response = client
+            .read_hello(gakusai2024_proto::api::ReadHelloRequest { name: name.clone() })
+            .await
+            .unwrap();
+
+        println!("RESPONSE={:?}", read_hello_response);
+
+        assert_eq!(
+            read_hello_response.get_ref().hello.as_ref().unwrap().name,
+            name
+        );
+        assert_eq!(
+            read_hello_response
+                .get_ref()
+                .hello
+                .as_ref()
+                .unwrap()
+                .message,
+            message
+        );
     }
 }

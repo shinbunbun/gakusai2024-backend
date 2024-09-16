@@ -1,4 +1,7 @@
-use gakusai2024_proto::hello::{hello_service_server::HelloService, HelloRequest, HelloResponse};
+use gakusai2024_proto::api::{
+    hello_service_server::HelloService, CreateHelloRequest, CreateHelloResponse, Hello,
+    ReadHelloRequest, ReadHelloResponse,
+};
 use tonic::{Request, Response, Status};
 
 use crate::{domain::repository::hello::HelloRepositoryTrait, usecase::hello::HelloUsecaseTrait};
@@ -41,28 +44,43 @@ where
     HU: HelloUsecaseTrait<HR> + 'static + Sync + Send,
     HR: HelloRepositoryTrait + Sync + Send + 'static,
 {
-    async fn say_hello(
+    async fn create_hello(
         &self,
-        request: Request<HelloRequest>,
-    ) -> Result<Response<HelloResponse>, Status> {
+        request: Request<CreateHelloRequest>,
+    ) -> Result<Response<CreateHelloResponse>, Status> {
         log::info!("Got a request: {:?}", request);
 
-        let name = request.into_inner().name;
+        let hello = request
+            .into_inner()
+            .hello
+            .ok_or_else(|| Status::invalid_argument("Hello is required"))?;
 
         _ = self
             .usecase
             .insert(crate::domain::hello::Hello {
-                name: name.clone(),
-                message: "Hello, ".to_string() + &name,
+                name: hello.name,
+                message: hello.message,
             })
             .await?;
 
+        Ok(Response::new(CreateHelloResponse {}))
+    }
+
+    async fn read_hello(
+        &self,
+        request: Request<ReadHelloRequest>,
+    ) -> Result<Response<ReadHelloResponse>, Status> {
+        log::info!("Got a request: {:?}", request);
+
+        let name = request.into_inner().name;
+
         let hello = self.usecase.find(name).await?;
 
-        let reply = HelloResponse {
-            message: hello.message,
-        };
-
-        Ok(Response::new(reply))
+        Ok(Response::new(ReadHelloResponse {
+            hello: Some(Hello {
+                name: hello.name,
+                message: hello.message,
+            }),
+        }))
     }
 }
