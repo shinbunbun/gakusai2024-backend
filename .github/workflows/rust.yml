@@ -23,7 +23,7 @@ jobs:
         chmod 600 ~/.ssh/id_ed25519
         ssh-keyscan github.com >> ~/.ssh/known_hosts
     - name: Build
-      run: CARGO_NET_GIT_FETCH_WITH_CLI=true cargo build --verbose
+      run: cargo build --verbose
     - name: Run tests
       run: cargo test --verbose
     - name: Run clippy
