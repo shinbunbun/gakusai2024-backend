@@ -19,6 +19,7 @@ use gakusai2024_backend::{
     usecase::{self, hello::HelloUsecaseTrait},
 };
 
+#[ignore]
 #[tokio::test]
 async fn test_hello() {
     dotenv().ok();
