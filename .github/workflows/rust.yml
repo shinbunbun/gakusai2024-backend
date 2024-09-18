@@ -16,15 +16,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: set SSH key
+    - name: config git
       run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
-        chmod 600 ~/.ssh/id_ed25519
-        ssh-keyscan github.com >> ~/.ssh/known_hosts
-        eval `ssh-agent -s`
-        ssh-add
-        echo "Host github.com\n HostName github.com\n IdentityFile ~/.ssh/id_ed25519" > ~/.ssh/config
+        git config --global --add url."git@github.com:".insteadOf "https://x-access-token:$GITHUB_TOKEN@github.com/"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Build
       run: CARGO_NET_GIT_FETCH_WITH_CLI=true cargo build --verbose
     - name: Run tests
