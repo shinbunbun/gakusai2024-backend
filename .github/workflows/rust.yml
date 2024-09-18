@@ -24,6 +24,7 @@ jobs:
         ssh-keyscan github.com >> ~/.ssh/known_hosts
         eval `ssh-agent -s`
         ssh-add
+        echo "Host github.com\n HostName github.com\n IdentityFile ~/.ssh/id_ed25519" > ~/.ssh/config
     - name: Build
       run: cargo build --verbose
     - name: Run tests
