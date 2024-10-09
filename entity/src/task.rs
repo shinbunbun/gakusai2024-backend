@@ -1,10 +1,11 @@
 use sea_orm::entity::prelude::*;
+use uuid::Uuid;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
 #[sea_orm(table_name = "task")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    pub id: String,
+    pub id: Uuid,
     pub title: String,
     pub description: String,
     pub due_date: TimeDateTimeWithTimeZone,
@@ -23,9 +24,8 @@ pub enum Relation {
         to = "super::user::Column::Id",
         on_update = "Cascade",
         on_delete = "Restrict"
-
     )]
-    User
+    User,
 }
 
 impl Related<super::user::Entity> for Entity {
@@ -33,6 +33,5 @@ impl Related<super::user::Entity> for Entity {
         Relation::User.def()
     }
 }
-
 
 impl ActiveModelBehavior for ActiveModel {}

@@ -752,6 +752,7 @@ name = "entity"
 version = "0.1.0"
 dependencies = [
  "sea-orm",
+ "uuid",
 ]
 
 [[package]]
@@ -1019,7 +1020,7 @@ dependencies = [
 [[package]]
 name = "gakusai2024-proto"
 version = "0.1.0"
-source = "git+ssh://git@github.com/shinbunbun/gakusai2024-proto.git?branch=feature/#1-createtask#9fc28ba3ad54a31008f19a0e9d2c7d9906a50cbe"
+source = "git+ssh://git@github.com/shinbunbun/gakusai2024-proto.git?rev=9f4733f#9f4733fcbd3013c9aeae67f770c1d34e6a1daec6"
 dependencies = [
  "bytes",
  "prost",
@@ -1041,8 +1042,10 @@ dependencies = [
  "log",
  "mockall",
  "prost",
+ "prost-types",
  "sea-orm",
  "thiserror",
+ "time",
  "tokio",
  "tokio-stream",
  "tonic",

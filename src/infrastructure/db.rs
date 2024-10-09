@@ -4,6 +4,7 @@ use sea_orm::DatabaseConnection;
 use tokio::sync::Mutex;
 
 pub mod hello;
+pub mod task;
 
 struct Repository {
     db: Arc<Mutex<DatabaseConnection>>,

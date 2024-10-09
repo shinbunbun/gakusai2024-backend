@@ -10,13 +10,12 @@ pub struct Model {
     pub password: String,
     pub created_at: TimeDateTimeWithTimeZone,
     pub updated_at: TimeDateTimeWithTimeZone,
-
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
     #[sea_orm(has_many = "super::task::Entity")]
-    Task
+    Task,
 }
 
 impl Related<super::task::Entity> for Entity {

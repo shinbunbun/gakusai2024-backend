@@ -3,6 +3,7 @@ pub use sea_orm_migration::prelude::*;
 mod m20240915_062259_create_hello_table;
 mod m20241004_014513_create_task_table;
 mod m20241004_030615_create_user_table;
+mod m20241008_232913_update_task_table;
 
 pub struct Migrator;
 
@@ -13,6 +14,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20240915_062259_create_hello_table::Migration),
             Box::new(m20241004_014513_create_task_table::Migration),
             Box::new(m20241004_030615_create_user_table::Migration),
+            Box::new(m20241008_232913_update_task_table::Migration),
         ]
     }
 }
