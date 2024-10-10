@@ -1020,7 +1020,7 @@ dependencies = [
 [[package]]
 name = "gakusai2024-proto"
 version = "0.1.0"
-source = "git+ssh://git@github.com/shinbunbun/gakusai2024-proto.git?rev=9f4733f#9f4733fcbd3013c9aeae67f770c1d34e6a1daec6"
+source = "git+ssh://git@github.com/shinbunbun/gakusai2024-proto.git?rev=290ba21#290ba21f65382bfd34d352cb7716f191cb55c44c"
 dependencies = [
  "bytes",
  "prost",

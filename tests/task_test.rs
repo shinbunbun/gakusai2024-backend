@@ -2,8 +2,7 @@ use std::sync::Arc;
 
 use dotenv::dotenv;
 use gakusai2024_proto::api::{
-    task_service_client::TaskServiceClient, task_service_server::TaskServiceServer,
-    CreateTaskRequest, GetTaskRequest, TaskRequest,
+    task_service_client::TaskServiceClient, task_service_server::TaskServiceServer, CreateTaskRequest, GetListTasksRequest, GetTaskRequest, TaskRequest
 };
 use hyper_util::rt::TokioIo;
 use sea_orm::Database;
@@ -18,7 +17,7 @@ use gakusai2024_backend::{
     usecase::{self, task::TaskUsecaseTrait},
 };
 
-#[ignore]
+//#[ignore]
 #[tokio::test]
 async fn test_task() {
     dotenv().ok();
@@ -85,6 +84,36 @@ async fn test_task() {
 
     println!("RESPONSE={:?}", get_task_response);
 
+    let requests = vec![
+        tonic::Request::new(CreateTaskRequest {
+            task_request: Some(TaskRequest {
+                title: "test_title2".to_string(),
+                description: Some("test_description".to_string()),
+                due_date: Some(prost_types::Timestamp::default()),
+                priority: 1,
+                weight: 1,
+                user_id: user_id.clone(),
+            }),
+        }),
+        tonic::Request::new(CreateTaskRequest {
+            task_request: Some(TaskRequest {
+                title: "test_title3".to_string(),
+                description: Some("test_description".to_string()),
+                due_date: Some(prost_types::Timestamp::default()),
+                priority: 1,
+                weight: 1,
+                user_id: "bunbun".to_string(),
+            }),
+        }),
+    ];
+
+    for r in requests {
+        let res = client.create_task(r).await.unwrap();
+        println!("RESPONSE={:?}", res);
+    }
+
+    let get_list_tasks_response = client.get_list_tasks(GetListTasksRequest{ user_id: user_id.clone() }).await.unwrap();
+
     assert_eq!(
         get_task_response.get_ref().task.as_ref().unwrap().title,
         title
@@ -92,5 +121,9 @@ async fn test_task() {
     assert_eq!(
         get_task_response.get_ref().task.as_ref().unwrap().user_id,
         user_id
+    );
+    assert_eq!(
+        get_list_tasks_response.get_ref().tasks[0].title,
+        "test_title".to_string()
     );
 }
