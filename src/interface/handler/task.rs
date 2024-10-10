@@ -1,6 +1,6 @@
 use gakusai2024_proto::api::{
-    task_service_server::TaskService, CreateTaskRequest, CreateTaskResponse, GetTaskRequest,
-    GetTaskResponse, GetListTasksRequest, GetListTasksResponse, Task,
+    task_service_server::TaskService, CreateTaskRequest, CreateTaskResponse, GetListTasksRequest,
+    GetListTasksResponse, GetTaskRequest, GetTaskResponse, Task,
 };
 use tonic::{Request, Response, Status};
 use uuid::Uuid;
@@ -111,7 +111,7 @@ where
             }),
         }))
     }
-    
+
     async fn get_list_tasks(
         &self,
         request: Request<GetListTasksRequest>,
@@ -120,11 +120,12 @@ where
 
         let user_id = request.into_inner().user_id;
 
-        let tasks = self.usecase.find_from_userid(user_id).await?;
+        let tasks = self.usecase.find_from_user_id(user_id).await?;
 
         Ok(Response::new(GetListTasksResponse {
-            tasks: tasks.iter().map(|t| {
-                Task {
+            tasks: tasks
+                .iter()
+                .map(|t| Task {
                     id: t.id.to_string(),
                     title: t.title.clone(),
                     description: Some(t.description.clone()),
@@ -143,9 +144,8 @@ where
                         nanos: t.updated_at.nanosecond() as i32,
                     }),
                     user_id: t.user_id.clone(),
-                }
-            }).collect()
+                })
+                .collect(),
         }))
     }
-
 }

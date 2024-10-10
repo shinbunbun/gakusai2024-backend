@@ -15,7 +15,10 @@ pub trait TaskUsecaseTrait<TR: TaskRepositoryTrait + 'static> {
         Self: Sized;
     fn insert(&self, task: Task) -> impl Future<Output = Result<Uuid, CustomError>> + Send;
     fn find(&self, id: Uuid) -> impl Future<Output = Result<Task, CustomError>> + Send;
-    fn find_from_userid(&self, user_id: String) -> impl Future<Output = Result<Vec<Task>, CustomError>> + Send;
+    fn find_from_user_id(
+        &self,
+        user_id: String,
+    ) -> impl Future<Output = Result<Vec<Task>, CustomError>> + Send;
 }
 
 pub struct TaskUsecase<TR: TaskRepositoryTrait> {
@@ -35,8 +38,11 @@ impl<TR: TaskRepositoryTrait + 'static> TaskUsecaseTrait<TR> for TaskUsecase<TR>
         self.repository.find(id)
     }
 
-    fn find_from_userid(&self,user_id:String) -> impl Future<Output = Result<Vec<Task>,CustomError>> +Send {
-        self.repository.find_from_userid(user_id)
+    fn find_from_user_id(
+        &self,
+        user_id: String,
+    ) -> impl Future<Output = Result<Vec<Task>, CustomError>> + Send {
+        self.repository.find_from_user_id(user_id)
     }
 }
 
@@ -135,9 +141,9 @@ mod tests {
                 created_at: OffsetDateTime::now_utc(),
                 updated_at: OffsetDateTime::now_utc(),
                 user_id: "harukun".to_string(),
-            }
+            },
         ];
-        mock.expect_find_from_userid()
+        mock.expect_find_from_user_id()
             .with(eq("harukun".to_string()))
             .returning(move |_| {
                 Box::pin({
@@ -147,9 +153,7 @@ mod tests {
             });
 
         let usecase = TaskUsecase::new(Box::new(mock));
-        let result = usecase
-            .find_from_userid("harukun".to_string())
-            .await;
+        let result = usecase.find_from_user_id("harukun".to_string()).await;
         assert!(result.is_ok());
     }
 }

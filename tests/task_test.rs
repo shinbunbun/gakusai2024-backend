@@ -2,7 +2,8 @@ use std::sync::Arc;
 
 use dotenv::dotenv;
 use gakusai2024_proto::api::{
-    task_service_client::TaskServiceClient, task_service_server::TaskServiceServer, CreateTaskRequest, GetListTasksRequest, GetTaskRequest, TaskRequest
+    task_service_client::TaskServiceClient, task_service_server::TaskServiceServer,
+    CreateTaskRequest, GetListTasksRequest, GetTaskRequest, TaskRequest,
 };
 use hyper_util::rt::TokioIo;
 use sea_orm::Database;
@@ -60,18 +61,18 @@ async fn test_task() {
 
     let mut client = TaskServiceClient::new(channel);
 
-    let title = "test_title".to_string();
-    let user_id = "harukun".to_string();
+    // CreateTaskとGetTaskのためのTaskRequest
+    let task_request = TaskRequest {
+        title: "test_title".to_string(),
+        description: Some("test_description".to_string()),
+        due_date: Some(prost_types::Timestamp::default()),
+        priority: 1,
+        weight: 1,
+        user_id: "harukun".to_string(),
+    };
 
     let request = tonic::Request::new(CreateTaskRequest {
-        task_request: Some(TaskRequest {
-            title: title.clone(),
-            description: Some("test_description".to_string()),
-            due_date: Some(prost_types::Timestamp::default()),
-            priority: 1,
-            weight: 1,
-            user_id: user_id.clone(),
-        }),
+        task_request: Some(task_request.clone()),
     });
 
     let create_task_response = client.create_task(request).await.unwrap();
@@ -84,16 +85,19 @@ async fn test_task() {
 
     println!("RESPONSE={:?}", get_task_response);
 
+    // GetListTasksのためのTaskRequest
+    let one_of_tasks = TaskRequest {
+        title: "test_title2".to_string(),
+        description: Some("test_description".to_string()),
+        due_date: Some(prost_types::Timestamp::default()),
+        priority: 1,
+        weight: 1,
+        user_id: "bunbun".to_string(),
+    };
+
     let requests = vec![
         tonic::Request::new(CreateTaskRequest {
-            task_request: Some(TaskRequest {
-                title: "test_title2".to_string(),
-                description: Some("test_description".to_string()),
-                due_date: Some(prost_types::Timestamp::default()),
-                priority: 1,
-                weight: 1,
-                user_id: user_id.clone(),
-            }),
+            task_request: Some(one_of_tasks.clone()),
         }),
         tonic::Request::new(CreateTaskRequest {
             task_request: Some(TaskRequest {
@@ -105,6 +109,16 @@ async fn test_task() {
                 user_id: "bunbun".to_string(),
             }),
         }),
+        tonic::Request::new(CreateTaskRequest {
+            task_request: Some(TaskRequest {
+                title: "test_title4".to_string(),
+                description: Some("test_description".to_string()),
+                due_date: Some(prost_types::Timestamp::default()),
+                priority: 1,
+                weight: 1,
+                user_id: "hina".to_string(),
+            }),
+        }),
     ];
 
     for r in requests {
@@ -112,18 +126,67 @@ async fn test_task() {
         println!("RESPONSE={:?}", res);
     }
 
-    let get_list_tasks_response = client.get_list_tasks(GetListTasksRequest{ user_id: user_id.clone() }).await.unwrap();
+    let get_list_tasks_response = client
+        .get_list_tasks(GetListTasksRequest {
+            user_id: "bunbun".to_string(),
+        })
+        .await
+        .unwrap();
 
+    // get_taskのassert
     assert_eq!(
         get_task_response.get_ref().task.as_ref().unwrap().title,
-        title
+        task_request.title
+    );
+    assert_eq!(
+        get_task_response
+            .get_ref()
+            .task
+            .as_ref()
+            .unwrap()
+            .description,
+        task_request.description
+    );
+    assert_eq!(
+        get_task_response.get_ref().task.as_ref().unwrap().due_date,
+        task_request.due_date
+    );
+    assert_eq!(
+        get_task_response.get_ref().task.as_ref().unwrap().priority,
+        task_request.priority
+    );
+    assert_eq!(
+        get_task_response.get_ref().task.as_ref().unwrap().weight,
+        task_request.weight
     );
     assert_eq!(
         get_task_response.get_ref().task.as_ref().unwrap().user_id,
-        user_id
+        task_request.user_id
     );
+
+    // get_list_tasksのassert
     assert_eq!(
         get_list_tasks_response.get_ref().tasks[0].title,
-        "test_title".to_string()
+        one_of_tasks.title
+    );
+    assert_eq!(
+        get_list_tasks_response.get_ref().tasks[0].description,
+        one_of_tasks.description
+    );
+    assert_eq!(
+        get_list_tasks_response.get_ref().tasks[0].due_date,
+        one_of_tasks.due_date
+    );
+    assert_eq!(
+        get_list_tasks_response.get_ref().tasks[0].priority,
+        one_of_tasks.priority
+    );
+    assert_eq!(
+        get_list_tasks_response.get_ref().tasks[0].weight,
+        one_of_tasks.weight
+    );
+    assert_eq!(
+        get_list_tasks_response.get_ref().tasks[0].user_id,
+        one_of_tasks.user_id
     );
 }

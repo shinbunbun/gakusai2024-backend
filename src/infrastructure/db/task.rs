@@ -70,7 +70,7 @@ impl TaskRepositoryTrait for TaskPersistence {
         }
     }
 
-    async  fn find_from_userid(&self,user_id:String) -> Result<Vec<Task>,CustomError> {
+    async fn find_from_user_id(&self, user_id: String) -> Result<Vec<Task>, CustomError> {
         let db_unlock = self.repository.get_db();
         let db_lock = db_unlock.lock().await;
         let db = db_lock.deref();
@@ -80,8 +80,9 @@ impl TaskRepositoryTrait for TaskPersistence {
             .all(db)
             .await?;
 
-        Ok(result.iter().map(|t| {
-            Task {
+        Ok(result
+            .iter()
+            .map(|t| Task {
                 id: t.id,
                 title: t.title.clone(),
                 description: t.description.clone(),
@@ -91,7 +92,7 @@ impl TaskRepositoryTrait for TaskPersistence {
                 created_at: t.created_at,
                 updated_at: t.updated_at,
                 user_id: t.user_id.clone(),
-            }
-        }).collect())
+            })
+            .collect())
     }
 }
