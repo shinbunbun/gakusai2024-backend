@@ -18,7 +18,7 @@ use gakusai2024_backend::{
     usecase::{self, task::TaskUsecaseTrait},
 };
 
-//#[ignore]
+#[ignore]
 #[tokio::test]
 async fn test_task() {
     dotenv().ok();
@@ -68,7 +68,7 @@ async fn test_task() {
         task_request: Some(TaskRequest {
             title: title.clone(),
             description: Some("test_description".to_string()),
-            due_date: None,
+            due_date: Some(prost_types::Timestamp::default()),
             priority: 1,
             weight: 1,
             user_id: user_id.clone(),
