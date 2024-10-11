@@ -1,6 +1,6 @@
 use gakusai2024_proto::api::{
-    task_service_server::TaskService, CreateTaskRequest, CreateTaskResponse, GetTaskRequest,
-    GetTaskResponse, Task,
+    task_service_server::TaskService, CreateTaskRequest, CreateTaskResponse, GetListTasksRequest,
+    GetListTasksResponse, GetTaskRequest, GetTaskResponse, Task,
 };
 use tonic::{Request, Response, Status};
 use uuid::Uuid;
@@ -109,6 +109,43 @@ where
                 }),
                 user_id: task.user_id,
             }),
+        }))
+    }
+
+    async fn get_list_tasks(
+        &self,
+        request: Request<GetListTasksRequest>,
+    ) -> Result<Response<GetListTasksResponse>, Status> {
+        log::info!("Got a request: {:?}", request);
+
+        let user_id = request.into_inner().user_id;
+
+        let tasks = self.usecase.find_from_user_id(user_id).await?;
+
+        Ok(Response::new(GetListTasksResponse {
+            tasks: tasks
+                .iter()
+                .map(|t| Task {
+                    id: t.id.to_string(),
+                    title: t.title.clone(),
+                    description: Some(t.description.clone()),
+                    due_date: Some(prost_types::Timestamp {
+                        seconds: t.due_date.unix_timestamp(),
+                        nanos: t.due_date.nanosecond() as i32,
+                    }),
+                    priority: t.priority,
+                    weight: t.weight,
+                    created_at: Some(prost_types::Timestamp {
+                        seconds: t.created_at.unix_timestamp(),
+                        nanos: t.created_at.nanosecond() as i32,
+                    }),
+                    updated_at: Some(prost_types::Timestamp {
+                        seconds: t.updated_at.unix_timestamp(),
+                        nanos: t.updated_at.nanosecond() as i32,
+                    }),
+                    user_id: t.user_id.clone(),
+                })
+                .collect(),
         }))
     }
 }
