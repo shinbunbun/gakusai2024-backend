@@ -11,20 +11,22 @@ path = "src/lib.rs"
 prost = "0.13.2"
 tokio = { version = "1.40.0", features = ["full"] }
 tonic = "0.12.2"
-tonic-reflection = "0.12.2"
-gakusai2024-proto = { git = "ssh://git@github.com/shinbunbun/gakusai2024-proto.git", rev = "d896b58" }
 env_logger = "0.11.5"
 log = "0.4.22"
 sea-orm = {version = "1.0.1", features = ["mock", "sqlx-postgres", "runtime-tokio-native-tls"] }
 entity ={ path = "./entity" }
 thiserror = "1.0.63"
 anyhow = "1.0.89"
+time = "0.3.36"
+prost-types = "~0.13.3"
 mockall = "0.13.0"
 tokio-stream = "0.1.16"
 tower = {version = "0.5.1", features = ["util"] }
 hyper-util = "0.1.8"
 dotenv = "0.15.0"
 uuid = {version = "1.10.0", features = ["v4"] }
+tonic-reflection = "0.12.3"
+gakusai2024-proto = { git = "ssh://git@github.com/shinbunbun/gakusai2024-proto.git", rev = "a412036", version = "0.1.0" }
 
 [build-dependencies]
 tonic-build = "0.12.2"
