@@ -8,7 +8,6 @@ pub struct Migration;
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        // create_foreign_key()はentityにRelationを書いた場合必要ない？
         manager
             .create_foreign_key(
                 sea_query::ForeignKey::create()
@@ -23,11 +22,13 @@ impl MigrationTrait for Migration {
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        // Replace the sample below with your own migration scripts
-        todo!();
-
         manager
-            .drop_table(Table::drop().table(User).to_owned())
+            .drop_foreign_key(
+                sea_query::ForeignKey::drop()
+                    .name("FK_User_Id")
+                    .table(Task)
+                    .to_owned(),
+            )
             .await
     }
 }

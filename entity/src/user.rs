@@ -1,13 +1,16 @@
+use async_trait;
 use sea_orm::entity::prelude::*;
+use sea_orm::Set;
+use time::OffsetDateTime;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
-#[sea_orm(table_name = "user")]
+#[sea_orm(table_name = "users")]
 pub struct Model {
-    #[sea_orm(primary_key)]
+    #[sea_orm(primary_key, column_name = "user_id")]
     pub id: String,
+    #[sea_orm(column_name = "name")]
     pub username: String,
     pub email: String,
-    pub password: String,
     pub created_at: TimeDateTimeWithTimeZone,
     pub updated_at: TimeDateTimeWithTimeZone,
 }
@@ -24,4 +27,26 @@ impl Related<super::task::Entity> for Entity {
     }
 }
 
-impl ActiveModelBehavior for ActiveModel {}
+#[async_trait::async_trait]
+impl ActiveModelBehavior for ActiveModel {
+    fn new() -> Self {
+        let now = OffsetDateTime::now_utc();
+        Self {
+            created_at: Set(now),
+            updated_at: Set(now),
+            ..ActiveModelTrait::default()
+        }
+    }
+
+    async fn before_save<C>(mut self, _db: &C, insert: bool) -> Result<Self, DbErr>
+    where
+        C: ConnectionTrait,
+    {
+        let now = OffsetDateTime::now_utc();
+        if insert {
+            self.created_at = Set(now);
+        }
+        self.updated_at = Set(now);
+        Ok(self)
+    }
+}

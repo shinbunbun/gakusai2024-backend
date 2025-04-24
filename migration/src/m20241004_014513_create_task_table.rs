@@ -32,7 +32,6 @@ impl MigrationTrait for Migration {
                             .timestamp_with_time_zone()
                             .not_null(),
                     )
-                    // create_foreign_key()を使うならこの行は必要ない？
                     .col(ColumnDef::new(Column::UserId).string().not_null())
                     .to_owned(),
             )

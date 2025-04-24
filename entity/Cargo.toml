@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 sea-orm = "1.0.1"
 uuid = {version = "1.10.0", features = ["v4"] }
+time = "0.3.34"

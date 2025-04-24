@@ -26,7 +26,7 @@ hyper-util = "0.1.11"
 dotenv = "0.15.0"
 uuid = {version = "1.16.0", features = ["v4"] }
 tonic-reflection = "0.13.0"
-gakusai2024-proto = { git = "ssh://git@github.com/shinbunbun/gakusai2024-proto.git", rev = "ceec9f350ed8c8599261284c7fad20a82702b6f2", version = "0.1.0" }
+gakusai2024-proto = { git = "ssh://git@github.com/shinbunbun/gakusai2024-proto.git", rev = "f7f6cd3698bc11ceb8c2b6ed92cf063cbadcce82", version = "0.1.0" }
 
 [build-dependencies]
 tonic-build = "0.12.2"

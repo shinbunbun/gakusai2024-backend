@@ -1,11 +1,18 @@
 use gakusai2024_proto::api::{
     task_service_server::TaskService, CreateTaskRequest, CreateTaskResponse, GetListTasksRequest,
-    GetListTasksResponse, GetTaskRequest, GetTaskResponse, Task,
+    GetListTasksResponse, GetTaskRequest, GetTaskResponse, Task as ProtoTask, UpdateTaskRequest,
+    UpdateTaskResponse,
 };
 use tonic::{Request, Response, Status};
 use uuid::Uuid;
 
-use crate::{domain::repository::task::TaskRepositoryTrait, usecase::task::TaskUsecaseTrait};
+use crate::{
+    domain::{
+        repository::task::TaskRepositoryTrait,
+        task::{Task, TaskExt},
+    },
+    usecase::task::TaskUsecaseTrait,
+};
 
 pub trait TaskHandlerTrait<TU, TR>
 where
@@ -89,7 +96,7 @@ where
         let task = self.usecase.find(id).await?;
 
         Ok(Response::new(GetTaskResponse {
-            task: Some(Task {
+            task: Some(ProtoTask {
                 id: task.id.to_string(),
                 title: task.title,
                 description: Some(task.description),
@@ -125,7 +132,7 @@ where
         Ok(Response::new(GetListTasksResponse {
             tasks: tasks
                 .iter()
-                .map(|t| Task {
+                .map(|t| ProtoTask {
                     id: t.id.to_string(),
                     title: t.title.clone(),
                     description: Some(t.description.clone()),
@@ -146,6 +153,51 @@ where
                     user_id: t.user_id.clone(),
                 })
                 .collect(),
+        }))
+    }
+
+    async fn update_task(
+        &self,
+        request: Request<UpdateTaskRequest>,
+    ) -> Result<Response<UpdateTaskResponse>, Status> {
+        log::info!("Got a request: {:?}", request);
+
+        let inner_request = request.into_inner();
+
+        let task_request = inner_request
+            .task_update
+            .ok_or_else(|| Status::invalid_argument("Task is required"))?;
+
+        // タスクIDをパース
+        let uuid = Uuid::parse_str(inner_request.task_id.as_str())
+            .map_err(|_| Status::invalid_argument("Invalid task ID"))?;
+
+        // 既存のタスクを取得
+        let existing_task = self.usecase.find(uuid).await?;
+
+        // ProtoTaskRequest -> ドメイン Task 変換
+        let due_date = if let Some(ts) = task_request.due_date {
+            Some(
+                time::OffsetDateTime::from_unix_timestamp(ts.seconds)
+                    .map_err(|_| Status::invalid_argument("Invalid timestamp"))?,
+            )
+        } else {
+            None
+        };
+        let updated_task = existing_task.update(
+            task_request.title,
+            task_request.description,
+            task_request.user_id,
+            due_date,
+            task_request.priority,
+            task_request.weight,
+        );
+
+        // 更新処理
+        self.usecase.update(updated_task).await?;
+
+        Ok(Response::new(UpdateTaskResponse {
+            task_id: uuid.to_string(),
         }))
     }
 }
