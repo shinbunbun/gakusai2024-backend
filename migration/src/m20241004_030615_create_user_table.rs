@@ -15,7 +15,6 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Column::Id).string().not_null().primary_key())
                     .col(ColumnDef::new(Column::Username).string().not_null())
                     .col(ColumnDef::new(Column::Email).string().not_null())
-                    .col(ColumnDef::new(Column::Password).string().not_null())
                     .col(
                         ColumnDef::new(Column::CreatedAt)
                             .timestamp_with_time_zone()

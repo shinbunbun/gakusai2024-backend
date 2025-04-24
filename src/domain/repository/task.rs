@@ -16,4 +16,5 @@ pub trait TaskRepositoryTrait {
         &self,
         user_id: String,
     ) -> impl Future<Output = Result<Vec<Task>, CustomError>> + Send;
+    fn update(&self, task: Task) -> impl Future<Output = Result<Uuid, CustomError>> + Send;
 }

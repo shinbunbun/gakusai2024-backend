@@ -95,4 +95,23 @@ impl TaskRepositoryTrait for TaskPersistence {
             })
             .collect())
     }
+
+    async fn update(&self, task: Task) -> Result<Uuid, CustomError> {
+        let db_unlock = self.repository.get_db();
+        let db_lock = db_unlock.lock().await;
+        let db = db_lock.deref();
+        let task_am = ActiveModel {
+            id: Set(task.id),
+            title: Set(task.title),
+            description: Set(task.description),
+            due_date: Set(task.due_date),
+            priority: Set(task.priority),
+            weight: Set(task.weight),
+            created_at: Set(task.created_at),
+            updated_at: Set(task.updated_at),
+            user_id: Set(task.user_id),
+        };
+        let update_result = TaskEntity::update(task_am).exec(db).await?;
+        Ok(update_result.id)
+    }
 }
