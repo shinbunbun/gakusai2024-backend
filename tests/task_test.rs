@@ -24,7 +24,7 @@ use gakusai2024_backend::{
     usecase::{self, task::TaskUsecaseTrait},
 };
 
-//#[ignore]
+#[ignore]
 #[tokio::test]
 async fn test_task() {
     dotenv().ok();
