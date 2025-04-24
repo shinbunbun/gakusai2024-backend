@@ -213,7 +213,9 @@ mod tests {
         // 結果の検証
         assert!(result.is_err());
         match result.unwrap_err() {
-            CustomError::Db(err) => assert_eq!(err.to_string(), "Update failed"),
+            CustomError::Db(err) => {
+                assert_eq!(err.to_string(), "RecordNotFound Error: Update failed")
+            }
             _ => panic!("Unexpected error type"),
         }
     }
